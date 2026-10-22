@@ -9,40 +9,6 @@
   <body>
     <div class="container">
       <ul class="comments">
-        <li class="comment">
-          <div class="comment-header">
-            <div>Глеб Фокин</div>
-            <div>12.02.22 12:18</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Это будет первый комментарий на этой странице
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">3</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>
-        <li class="comment">
-          <div class="comment-header">
-            <div>Варвара Н.</div>
-            <div>13.02.22 19:22</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Мне нравится как оформлена эта страница! ❤
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">75</span>
-              <button class="like-button -active-like"></button>
-            </div>
-          </div>
-        </li>
       </ul>
       <div class="add-form">
         <input
@@ -65,64 +31,130 @@
     <script>
       "use strict";
 
-      const nameInput = document.querySelector('.add-form-name');
-      const textInput = document.querySelector('.add-form-text');
-
-      function updatePlaceholder() {
-        if (nameInput.value.trim() !== '' || textInput.value.trim() !== '') {
-          nameInput.placeholder = 'Имя';
-          textInput.placeholder = 'Комментарий';
-        } else {
-          nameInput.placeholder = 'Введите ваше имя';
-          textInput.placeholder = 'Введите ваш коментарий';
+      let commentsData = [
+        {
+          id: "comment-1",
+          name: "Глеб Фокин",
+          date: "12.02.22",
+          time: "12:18",
+          text: "Это будет первый комментарий на этой странице",
+          likes: 3,
+          liked: false
+        },
+        {
+          id: "comment-2",
+          name: "Варвара Н.",
+          date: "13.02.22",
+          time: "19:22",
+          text: "Мне нравится как оформлена эта страница! ❤",
+          likes: 75,
+          liked: true
         }
-      }
+      ];
 
-      nameInput.addEventListener('input', updatePlaceholder);
-      textInput.addEventListener('input', updatePlaceholder);
 
-      const addButton = document.querySelector('.add-form-button');
-      addButton.addEventListener('click', addComment);
+      function renderComments() {
+        const commentsList = document.querySelector(".comments");
+        commentsList.innerHTML = "";
 
-  
-      function addComment() {
-        const name = nameInput.value.trim();
-        const commentText = textInput.value.trim();
-
-        if (!name || !commentText) {
-          alert('Имя и комментарий обязательны!');
-          return;
-        }
-
-        const now = new Date();
-        const date = now.toLocaleDateString('ru-RU');
-        const time = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-
-        const newCommentHTML = `
-          <li class="comment">
-            <div class="comment-header">
-              <div>${name}</div>
-              <div>${date} ${time}</div>
-            </div>
-            <div class="comment-body">
-              <div class="comment-text">${commentText}</div>
-            </div>
-            <div class="comment-footer">
-              <div class="likes">
-                <span class="likes-counter">0</span>
-                <button class="like-button"></button>
+        commentsData.forEach((comment) => {
+          const commentHTML = `
+            <li class="comment">
+              <div class="comment-header">
+                <div>${comment.name}</div>
+                <div>${comment.date} ${comment.time}</div>
               </div>
-            </div>
-          </li>
-        `;
-        const commentsList = document.querySelector('.comments');
+              <div class="comment-body">
+                <div class="comment-text">${comment.text}</div>
+              </div>
+              <div class="comment-footer">
+                <div class="likes">
+                  <span class="likes-counter">${comment.likes}</span>
+                  <button class="like-button ${comment.liked ? "-active-like" : ""}"></button>
+                </div>
+              </div>
+            </li>
+          `;
+          commentsList.insertAdjacentHTML("beforeend", commentHTML);
+        });
 
-        commentsList.insertAdjacentHTML('beforeend', newCommentHTML);
+        const likeButtons = document.querySelectorAll(".like-button");
+        likeButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const commentElement = button.closest(".comment");
+            const index = Array.from(document.querySelectorAll(".comment")).indexOf(commentElement);
+            const comment = commentsData[index];
 
-        nameInput.value = '';
-        textInput.value = '';
-        updatePlaceholder();
+            comment.liked = !comment.liked;
+            comment.likes = comment.liked ? comment.likes + 1 : comment.likes - 1;
+
+            renderComments();
+          });
+        });
       }
+
+      
+      function updatePlaceholder() {
+        const nameInput = document.querySelector(".add-form-name");
+        const textInput = document.querySelector(".add-form-text");
+
+        if (nameInput.value.trim() !== "" || textInput.value.trim() !== "") {
+          nameInput.placeholder = "Имя";
+          textInput.placeholder = "Комментарий";
+        } else {
+          nameInput.placeholder = "Введите ваше имя";
+          textInput.placeholder = "Введите ваш коментарий";
+        }
+      }
+
+      document
+        .querySelector(".add-form-name")
+        .addEventListener("input", updatePlaceholder);
+      document
+        .querySelector(".add-form-text")
+        .addEventListener("input", updatePlaceholder);
+
+      document
+        .querySelector(".add-form-button")
+        .addEventListener("click", () => {
+          const nameInput = document.querySelector(".add-form-name");
+          const textInput = document.querySelector(".add-form-text");
+
+          const name = nameInput.value.trim();
+          const text = textInput.value.trim();
+
+          if (!name || !text) {
+            alert("Имя и комментарий обязательны!");
+            return;
+          }
+
+          const now = new Date();
+          const date = now.toLocaleDateString("ru-RU");
+          const time = now.toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          const newComment = {
+            id: `comment-${Date.now()}`,
+            name: name,
+            date: date,
+            time: time,
+            text: text,
+            likes: 0,
+            liked: false,
+          };
+
+          commentsData.push(newComment);
+
+          renderComments();
+
+          nameInput.value = "";
+          textInput.value = "";
+          updatePlaceholder();
+        });
+
+      renderComments();
     </script>
   </body>
 </html>
